@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Movie {
-    pub id: u32,
+    pub id: i64,
     pub title: String,
-    pub year: i32,
+    //pub year: i32,
 }
 
 impl Movie {

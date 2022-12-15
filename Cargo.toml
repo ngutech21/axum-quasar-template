@@ -11,6 +11,7 @@ axum-extra = { version = "0.4.2", features = ["erased-json"] }
 serde = { version = "1.0.150", features = ["derive"] }
 serde_derive = "1.0.150"
 serde_json = "1.0.89"
+sqlx = { version = "0.6.2", features = ["runtime-tokio-rustls", "postgres", "macros"] }
 tokio = { version = "1.23.0", features = ["full"] }
 tower-http = { version = "0.3.5", features = ["trace"] }
 tracing = "0.1.37"
