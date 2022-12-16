@@ -64,16 +64,12 @@ mod tests {
     use axum::body::Body;
     use axum::http::Request;
     use axum::http::StatusCode;
-    use tower::ServiceExt; // for
+    use tower::ServiceExt;
 
     struct MockDB {}
 
     #[async_trait]
     impl DB for MockDB {
-        async fn query(&self, _query: String) -> i64 {
-            0
-        }
-
         async fn get_all_movies(&self) -> Vec<Movie> {
             vec![Movie {
                 id: 666,
