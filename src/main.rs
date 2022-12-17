@@ -25,10 +25,10 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let line = format!("movies {:?}", result);
+    let line = format!("movies {:?}", result.len());
     event!(Level::INFO, line);
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     println!("listening on {}", addr);
     axum::Server::bind(&addr)
         .serve(

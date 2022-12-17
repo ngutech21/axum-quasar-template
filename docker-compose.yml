@@ -9,3 +9,9 @@ services:
       POSTGRES_USER: axum 
       POSTGRES_PASSWORD: axum 
       POSTGRES_DB: axum_movies 
+  app:
+    image: 'axum-quasar'
+    ports:
+      - 3000:3000 
+    environment:
+      - DATABASE_URL=postgres://axum:axum@database/axum_movies
