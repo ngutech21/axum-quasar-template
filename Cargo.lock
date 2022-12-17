@@ -115,6 +115,7 @@ dependencies = [
  "async-trait",
  "axum",
  "axum-extra",
+ "dotenvy",
  "hyper",
  "serde",
  "serde_derive",

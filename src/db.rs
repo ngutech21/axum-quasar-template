@@ -11,7 +11,10 @@ impl PostgresDB {
         Ok(PostgresDB {
             pool: PgPoolOptions::new()
                 .max_connections(5)
-                .connect("postgres://axum:axum@localhost/axum_movies")
+                .connect(
+                    &dotenvy::var("DATABASE_URL")
+                        .expect("environment variable DATABASE_URL is not set"),
+                )
                 .await?,
         })
     }
