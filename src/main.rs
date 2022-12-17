@@ -1,10 +1,13 @@
 use axum::{extract::State, response::Html, routing::get, Json, Router};
+use axum_extra::routing::SpaRouter;
 use db::PostgresDB;
 use db::DB;
+use hyper::Method;
 use model::Movie;
 use std::{net::SocketAddr, sync::Arc};
 use tracing::{event, Level};
 
+use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
@@ -28,22 +31,27 @@ async fn main() {
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
     println!("listening on {}", addr);
     axum::Server::bind(&addr)
-        .serve(app(Box::new(db)).into_make_service())
+        .serve(
+            app(Box::new(db))
+                .layer(
+                    CorsLayer::new()
+                        // .allow_origin("http://localhost:9000".parse::<HeaderValue>().unwrap())
+                        .allow_origin(Any)
+                        .allow_methods([Method::GET]),
+                )
+                .into_make_service(),
+        )
         .await
         .unwrap();
 }
 
 fn app(db: Box<dyn DB + Send + Sync>) -> Router {
     Router::new()
-        .route("/", get(handler))
         .route("/movies", get(get_movies))
         .route("/import_movies", get(import_movies))
+        .merge(SpaRouter::new("/", "quasar-project/dist/spa").index_file("index.html"))
         .with_state(Arc::new(db))
         .layer(TraceLayer::new_for_http())
-}
-
-async fn handler() -> Html<&'static str> {
-    Html("<h1>Hello, World!</h1>")
 }
 
 async fn get_movies(State(db): DBState) -> Json<Vec<Movie>> {
