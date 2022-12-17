@@ -6,46 +6,39 @@
   </q-page>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Movie } from 'components/models';
-import { defineComponent, ref } from 'vue';
 import { api } from 'boot/axios';
 import { QTableColumn } from 'quasar';
 import { useQuasar } from 'quasar';
+import { ref } from 'vue';
 
-export default defineComponent({
-  name: 'IndexPage',
-  setup() {
-    const movies = ref([] as Movie[]);
-    const $q = useQuasar();
+const movies = ref([] as Movie[]);
 
-    const columns = [
-      { name: 'id', align: 'left', label: 'Id', field: 'id', sortable: true },
-      {
-        name: 'title',
-        align: 'left',
-        label: 'Title',
-        field: 'title',
-        sortable: true,
-      },
-    ] as QTableColumn[];
-
-    api
-      .get('/movies')
-      .then((response) => {
-        movies.value = response.data;
-      })
-      .catch(() => {
-        $q.notify({
-          color: 'negative',
-          position: 'top',
-          message: 'Loading movies failed',
-          icon: 'report_problem',
-        });
-        console.log('Loading failed');
-      });
-
-    return { movies, columns };
+const columns = [
+  { name: 'id', align: 'left', label: 'Id', field: 'id', sortable: true },
+  {
+    name: 'title',
+    align: 'left',
+    label: 'Title',
+    field: 'title',
+    sortable: true,
   },
-});
+] as QTableColumn[];
+
+const $q = useQuasar();
+api
+  .get('/movies')
+  .then((response) => {
+    movies.value = response.data;
+  })
+  .catch(() => {
+    $q.notify({
+      color: 'negative',
+      position: 'top',
+      message: 'Loading movies failed',
+      icon: 'report_problem',
+    });
+    console.log('Loading failed');
+  });
 </script>
