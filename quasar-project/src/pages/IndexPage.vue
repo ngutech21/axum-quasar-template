@@ -28,7 +28,7 @@ const columns = [
 
 const $q = useQuasar();
 api
-  .get('/movies')
+  .get('/api/v1/movies')
   .then((response) => {
     movies.value = response.data;
   })

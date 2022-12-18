@@ -47,8 +47,8 @@ async fn main() {
 
 fn app(db: Box<dyn DB + Send + Sync>) -> Router {
     Router::new()
-        .route("/movies", get(get_movies))
-        .route("/import_movies", get(import_movies))
+        .route("/api/v1/movies", get(get_movies))
+        .route("/api/v1/import_movies", get(import_movies))
         .merge(SpaRouter::new("/", "quasar-project/dist/spa").index_file("index.html"))
         .with_state(Arc::new(db))
         .layer(TraceLayer::new_for_http())
@@ -102,7 +102,7 @@ mod tests {
         let response = app
             .oneshot(
                 Request::builder()
-                    .uri("/movies")
+                    .uri("/api/v1/movies")
                     .body(Body::empty())
                     .unwrap(),
             )
