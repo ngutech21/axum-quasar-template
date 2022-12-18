@@ -6,12 +6,12 @@ services:
     ports:
       - 5432:5432
     environment:
-      POSTGRES_USER: axum 
-      POSTGRES_PASSWORD: axum 
-      POSTGRES_DB: axum_movies 
+      POSTGRES_USER: postgres 
+      POSTGRES_PASSWORD: postgres 
+      POSTGRES_DB: axum_quasar 
   app:
-    image: 'repo/axum-quasar'
+    image: 'axum-quasar'
     ports:
       - 3000:3000 
     environment:
-      - DATABASE_URL=postgres://axum:axum@database/axum_movies
+      - DATABASE_URL=postgres://postgres:postgres@database/axum_quasar

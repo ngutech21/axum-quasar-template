@@ -12,4 +12,4 @@ CREATE TABLE IF NOT EXISTS public.movies
 TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.movies
-    OWNER to axum;
+    OWNER to postgres;
