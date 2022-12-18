@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: axum 
       POSTGRES_DB: axum_movies 
   app:
-    image: 'axum-quasar'
+    image: 'repo/axum-quasar'
     ports:
       - 3000:3000 
     environment:

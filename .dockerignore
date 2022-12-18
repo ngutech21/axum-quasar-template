@@ -1,0 +1,72 @@
+# flyctl launch added from .gitignore
+target
+**/TODO.txt
+**/.DS_Store
+
+# flyctl launch added from quasar-project/.gitignore
+quasar-project/**/.DS_Store
+quasar-project/**/.thumbs.db
+quasar-project/**/node_modules
+
+
+# Cordova related directories and files
+quasar-project/src-cordova/node_modules
+quasar-project/src-cordova/platforms
+quasar-project/src-cordova/plugins
+quasar-project/src-cordova/www
+
+# Capacitor related directories and files
+quasar-project/src-capacitor/www
+quasar-project/src-capacitor/node_modules
+
+# BEX related directories and files
+quasar-project/src-bex/www
+quasar-project/src-bex/js/core
+
+# Log files
+quasar-project/**/npm-debug.log*
+quasar-project/**/yarn-debug.log*
+quasar-project/**/yarn-error.log*
+
+# Editor directories and files
+quasar-project/**/.idea
+quasar-project/**/*.suo
+quasar-project/**/*.ntvs*
+quasar-project/**/*.njsproj
+quasar-project/**/*.sln
+
+# flyctl launch added from target/release/quasar-project/.gitignore
+target/release/quasar-project/**/.DS_Store
+target/release/quasar-project/**/.thumbs.db
+target/release/quasar-project/**/node_modules
+
+# Quasar core related directories
+target/release/quasar-project/**/.quasar
+target/release/quasar-project/dist
+
+# Cordova related directories and files
+target/release/quasar-project/src-cordova/node_modules
+target/release/quasar-project/src-cordova/platforms
+target/release/quasar-project/src-cordova/plugins
+target/release/quasar-project/src-cordova/www
+
+# Capacitor related directories and files
+target/release/quasar-project/src-capacitor/www
+target/release/quasar-project/src-capacitor/node_modules
+
+# BEX related directories and files
+target/release/quasar-project/src-bex/www
+target/release/quasar-project/src-bex/js/core
+
+# Log files
+target/release/quasar-project/**/npm-debug.log*
+target/release/quasar-project/**/yarn-debug.log*
+target/release/quasar-project/**/yarn-error.log*
+
+# Editor directories and files
+target/release/quasar-project/**/.idea
+target/release/quasar-project/**/*.suo
+target/release/quasar-project/**/*.ntvs*
+target/release/quasar-project/**/*.njsproj
+target/release/quasar-project/**/*.sln
+fly.toml

@@ -18,6 +18,13 @@ impl PostgresDB {
                 .await?,
         })
     }
+
+    pub async fn migrate(&self) {
+        sqlx::migrate!("./migrations")
+            .run(&self.pool)
+            .await
+            .expect("Could not run migrations");
+    }
 }
 
 #[async_trait]
