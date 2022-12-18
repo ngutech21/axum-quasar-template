@@ -4,7 +4,7 @@ use db::PostgresDB;
 use db::DB;
 use hyper::Method;
 use model::Movie;
-use std::{net::SocketAddr, sync::Arc};
+use std::sync::Arc;
 use tracing::{event, Level};
 
 use tower_http::cors::{Any, CorsLayer};
@@ -27,14 +27,13 @@ async fn main() {
 
     event!(Level::INFO, "startup");
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
-    println!("listening on {}", addr);
+    let addr = "[::]:8080".parse().unwrap();
+    event!(Level::INFO, "listening on {}", addr);
     axum::Server::bind(&addr)
         .serve(
             app(Box::new(db))
                 .layer(
                     CorsLayer::new()
-                        // .allow_origin("http://localhost:9000".parse::<HeaderValue>().unwrap())
                         .allow_origin(Any)
                         .allow_methods([Method::GET]),
                 )
