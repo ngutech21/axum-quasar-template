@@ -27,7 +27,7 @@ async fn main() {
 
     event!(Level::INFO, "startup");
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
     println!("listening on {}", addr);
     axum::Server::bind(&addr)
         .serve(

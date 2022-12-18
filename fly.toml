@@ -6,7 +6,7 @@ kill_timeout = 5
 processes = []
 
 [build]
-image = "repo/axum-quasar:latest"
+image = "registry.fly.io/axum-quasar:latest"
 
 [env]
 
