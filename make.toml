@@ -1,0 +1,14 @@
+[tasks.format]
+install_crate = "rustfmt"
+command = "cargo"
+args = ["fmt", "--", "--emit=files"]
+
+[tasks.build-backend]
+command = "cargo"
+args = ["build", "--release"]
+
+[tasks.build-frontend]
+command = "yarn"
+args = ["--cwd", "quasar-project", "quasar", "build"]
+
+[tasks.build-docker]
