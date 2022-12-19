@@ -9,7 +9,7 @@
 
 ### build frontend
 
-cd quasar-project
+cd frontend
 yarn global add @quasar/cli
 yarn
 yarn quasar build
@@ -19,4 +19,4 @@ yarn quasar build
 sqlx migrate run
 cargo run
 
-<http://127.0.0.1:3000/import_movies>
+open <http://127.0.0.1:8080>

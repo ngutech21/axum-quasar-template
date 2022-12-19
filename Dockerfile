@@ -1,7 +1,7 @@
 # build frontend
 FROM node:18-bullseye-slim as frontend-builder
 WORKDIR /app
-COPY quasar-project ./
+COPY frontend ./
 RUN yarn global add @quasar/cli
 RUN yarn
 RUN quasar build
@@ -19,7 +19,7 @@ RUN cargo build --release
 
 #FROM gcr.io/distroless/cc-debian11:debug
 FROM debian:bullseye-slim
-COPY --from=frontend-builder /app/dist/spa /app/quasar-project/dist/spa
+COPY --from=frontend-builder /app/dist/spa /app/frontend/dist/spa
 COPY --from=rust-builder /rust-app/target/release/axum-quasar /app
 COPY --from=rust-builder /rust-app/migrations /app/migrations
 COPY --from=rust-builder /rust-app/dummy_data.json /app

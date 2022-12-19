@@ -47,7 +47,7 @@ fn app(db: Box<dyn DB + Send + Sync>) -> Router {
     Router::new()
         .route("/api/v1/movies", get(get_movies))
         .route("/api/v1/import_movies", get(import_movies))
-        .merge(SpaRouter::new("/", "quasar-project/dist/spa").index_file("index.html"))
+        .merge(SpaRouter::new("/", "frontend/dist/spa").index_file("index.html"))
         .with_state(Arc::new(db))
         .layer(TraceLayer::new_for_http())
 }
