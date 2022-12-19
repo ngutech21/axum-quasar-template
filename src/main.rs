@@ -3,7 +3,7 @@ use axum_extra::routing::SpaRouter;
 use db::PostgresDB;
 use db::DB;
 use hyper::Method;
-use model::Movie;
+use model::{AxumQuasarError, Movie};
 use std::sync::Arc;
 use tracing::{event, Level};
 
@@ -17,8 +17,8 @@ mod model;
 type DBState = State<Arc<Box<dyn DB + Send + Sync>>>;
 
 #[tokio::main]
-async fn main() {
-    let db = PostgresDB::new().await.unwrap();
+async fn main() -> anyhow::Result<()> {
+    let db = PostgresDB::new().await?;
     db.migrate().await;
 
     tracing_subscriber::registry()
@@ -27,7 +27,7 @@ async fn main() {
 
     event!(Level::INFO, "startup");
 
-    let addr = "[::]:8080".parse().unwrap();
+    let addr = "[::]:8080".parse()?;
     event!(Level::INFO, "listening on {}", addr);
     axum::Server::bind(&addr)
         .serve(
@@ -39,8 +39,8 @@ async fn main() {
                 )
                 .into_make_service(),
         )
-        .await
-        .unwrap();
+        .await?;
+    Ok(())
 }
 
 fn app(db: Box<dyn DB + Send + Sync>) -> Router {
@@ -52,9 +52,9 @@ fn app(db: Box<dyn DB + Send + Sync>) -> Router {
         .layer(TraceLayer::new_for_http())
 }
 
-async fn get_movies(State(db): DBState) -> Json<Vec<Movie>> {
-    let result = db.get_all_movies().await;
-    Json(result)
+async fn get_movies(State(db): DBState) -> Result<Json<Vec<Movie>>, AxumQuasarError> {
+    let result = db.get_all_movies().await?;
+    Ok(Json(result))
 }
 
 async fn import_movies(State(db): DBState) -> Html<&'static str> {
@@ -76,15 +76,15 @@ mod tests {
 
     #[async_trait]
     impl DB for MockDB {
-        async fn get_all_movies(&self) -> Vec<Movie> {
-            vec![Movie {
+        async fn get_all_movies(&self) -> Result<Vec<Movie>, AxumQuasarError> {
+            Ok(vec![Movie {
                 id: 666,
                 title: "foo".to_string(),
-            }]
+            }])
         }
 
         #[allow(dead_code)]
-        async fn import_movies(&self, _movies: Vec<Movie>) {
+        async fn import_movies(&self, _movies: Vec<Movie>) -> Result<(), AxumQuasarError> {
             unimplemented!()
         }
     }
@@ -95,24 +95,23 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_movies() {
+    async fn test_get_movies() -> anyhow::Result<()> {
         let app = app(create_mock_db());
         let response = app
             .oneshot(
                 Request::builder()
                     .uri("/api/v1/movies")
-                    .body(Body::empty())
-                    .unwrap(),
+                    .body(Body::empty())?,
             )
-            .await
-            .unwrap();
+            .await?;
 
         assert_eq!(response.status(), StatusCode::OK);
-        let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
-        let result_data: Vec<Movie> = serde_json::from_slice(&body).unwrap();
+        let body = hyper::body::to_bytes(response.into_body()).await?;
+        let result_data: Vec<Movie> = serde_json::from_slice(&body)?;
         assert_eq!(result_data[0].id, 666);
         assert_eq!(result_data[0].title, "foo");
 
         dbg!(result_data);
+        Ok(())
     }
 }

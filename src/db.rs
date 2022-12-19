@@ -1,4 +1,4 @@
-use crate::model::Movie;
+use crate::model::{AxumQuasarError, Movie};
 use async_trait::async_trait;
 use sqlx::postgres::PgPoolOptions;
 
@@ -29,18 +29,18 @@ impl PostgresDB {
 
 #[async_trait]
 pub trait DB {
-    async fn get_all_movies(&self) -> Vec<Movie>;
-    async fn import_movies(&self, movies: Vec<Movie>);
+    async fn get_all_movies(&self) -> Result<Vec<Movie>, AxumQuasarError>;
+    async fn import_movies(&self, movies: Vec<Movie>) -> Result<(), AxumQuasarError>;
 }
 
 #[async_trait]
 impl DB for PostgresDB {
-    async fn get_all_movies(&self) -> Vec<Movie> {
+    async fn get_all_movies(&self) -> Result<Vec<Movie>, AxumQuasarError> {
         let row = sqlx::query_as::<_, Movie>("SELECT * from movies").fetch_all(&self.pool);
-        row.await.unwrap()
+        Ok(row.await?)
     }
 
-    async fn import_movies(&self, movies: Vec<Movie>) {
+    async fn import_movies(&self, movies: Vec<Movie>) -> Result<(), AxumQuasarError> {
         for movie in movies {
             sqlx::query(
                 r#"INSERT INTO public.movies (id, title) VALUES ($1, $2);
@@ -49,8 +49,8 @@ impl DB for PostgresDB {
             .bind(movie.id)
             .bind(movie.title)
             .execute(&self.pool)
-            .await
-            .unwrap();
+            .await?;
         }
+        Ok(())
     }
 }
