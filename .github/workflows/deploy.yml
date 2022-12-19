@@ -1,0 +1,28 @@
+name: Docker Image CI
+
+on:
+  workflow_dispatch:
+
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+jobs:
+
+  deploy:
+
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+    - uses: actions/checkout@v3
+    - name: build image
+      run: docker build --platform linux/amd64 -t registry.fly.io/axum-quasar:latest .
+    
+    - name: auth docker
+    - uses: superfly/flyctl-actions/setup-flyctl@master
+    - run: flyctl auth docker
+    
+    - name: docker push
+    - run: docker push registry.fly.io/axum-quasar:latest
+    
+    - name: deploy
+    - run: flyctl deploy -i registry.fly.io/axum-quasar:latest
+     
