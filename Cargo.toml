@@ -14,7 +14,7 @@ dotenvy = "0.15.6"
 hyper = "0.14.23"
 serde = { version = "1.0.151", features = ["derive"] }
 serde_derive = "1.0.150"
-serde_json = "1.0.89"
+serde_json = "1.0.91"
 sqlx = { version = "0.6.2", features = ["runtime-tokio-rustls", "postgres", "macros", "migrate"] }
 thiserror = "1.0.38"
 tokio = { version = "1.23.0", features = ["full"] }
