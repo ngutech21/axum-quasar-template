@@ -57,14 +57,16 @@ async fn get_movies(State(db): DBState) -> Result<Json<Vec<Movie>>, AxumQuasarEr
     Ok(Json(result))
 }
 
-async fn import_movies(State(db): DBState) -> Html<&'static str> {
+async fn import_movies(State(db): DBState) -> Result<Html<&'static str>, AxumQuasarError> {
     let result = Movie::load_dummy_data();
-    db.import_movies(result).await;
-    Html("<h1>finished importing</h1>")
+    db.import_movies(result).await?;
+    Ok(Html("<h1>finished importing</h1>"))
 }
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
     use super::*;
     use async_trait::async_trait;
     use axum::body::Body;
@@ -80,11 +82,17 @@ mod tests {
             Ok(vec![Movie {
                 id: 666,
                 title: "foo".to_string(),
+                genres: HashSet::new(),
             }])
         }
 
         #[allow(dead_code)]
         async fn import_movies(&self, _movies: Vec<Movie>) -> Result<(), AxumQuasarError> {
+            unimplemented!()
+        }
+
+        #[allow(dead_code)]
+        async fn insert_movie(&self, _movie: Movie) -> Result<(), AxumQuasarError> {
             unimplemented!()
         }
     }
@@ -111,6 +119,24 @@ mod tests {
         assert_eq!(result_data[0].id, 666);
         assert_eq!(result_data[0].title, "foo");
 
+        dbg!(result_data);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_get_movies_from_db() -> anyhow::Result<()> {
+        let app = app(Box::new(PostgresDB::new().await.unwrap()));
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/v1/movies")
+                    .body(Body::empty())?,
+            )
+            .await?;
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = hyper::body::to_bytes(response.into_body()).await?;
+        let result_data: Vec<Movie> = serde_json::from_slice(&body)?;
         dbg!(result_data);
         Ok(())
     }

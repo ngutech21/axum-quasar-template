@@ -2,9 +2,10 @@
 
 -- DROP TABLE IF EXISTS public.movies;
 
+CREATE SEQUENCE movies_id_seq START 1;
 CREATE TABLE IF NOT EXISTS public.movies
 (
-    id bigint NOT NULL,
+    id integer NOT NULL DEFAULT nextval('movies_id_seq'::regclass),
     title character varying COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT movies_pkey PRIMARY KEY (id)
 )

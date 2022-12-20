@@ -1,4 +1,6 @@
-use crate::model::{AxumQuasarError, Movie};
+use std::collections::{HashMap, HashSet};
+
+use crate::model::{AxumQuasarError, Genre, Movie};
 use async_trait::async_trait;
 use sqlx::postgres::PgPoolOptions;
 
@@ -30,14 +32,54 @@ impl PostgresDB {
 #[async_trait]
 pub trait DB {
     async fn get_all_movies(&self) -> Result<Vec<Movie>, AxumQuasarError>;
+    async fn insert_movie(&self, movie: Movie) -> Result<(), AxumQuasarError>;
     async fn import_movies(&self, movies: Vec<Movie>) -> Result<(), AxumQuasarError>;
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, sqlx::FromRow)]
+struct MovieWithGenresQuery {
+    movie_id: i32,
+    movie_title: String,
+    genre_id: i32,
+    genre_name: String,
 }
 
 #[async_trait]
 impl DB for PostgresDB {
     async fn get_all_movies(&self) -> Result<Vec<Movie>, AxumQuasarError> {
-        let row = sqlx::query_as::<_, Movie>("SELECT * from movies").fetch_all(&self.pool);
-        Ok(row.await?)
+        Ok(
+            sqlx::query_file_as!(MovieWithGenresQuery, "queries/get_all_movies.sql")
+                .fetch_all(&self.pool)
+                .await?
+                .into_iter()
+                .fold(HashMap::new(), |mut movies, row| {
+                    let movie = movies.entry(row.movie_id).or_insert(Movie {
+                        id: row.movie_id,
+                        title: row.movie_title,
+                        genres: HashSet::new(),
+                    });
+                    movie.genres.insert(Genre {
+                        id: row.genre_id,
+                        name: row.genre_name,
+                    });
+                    movies
+                })
+                .values()
+                .cloned()
+                .collect(),
+        )
+    }
+
+    async fn insert_movie(&self, movie: Movie) -> Result<(), AxumQuasarError> {
+        sqlx::query(
+            r#"INSERT INTO public.movies (id, title) VALUES ($1, $2);
+            "#,
+        )
+        .bind(movie.id)
+        .bind(movie.title)
+        .execute(&self.pool)
+        .await?;
+        Ok(())
     }
 
     async fn import_movies(&self, movies: Vec<Movie>) -> Result<(), AxumQuasarError> {

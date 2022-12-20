@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use axum::{
     response::{IntoResponse, Response},
     Json,
@@ -9,9 +11,16 @@ use thiserror::Error;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Movie {
-    pub id: i64,
+    pub id: i32,
     pub title: String,
     //pub year: i32,
+    pub genres: HashSet<Genre>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, sqlx::FromRow, Hash)]
+pub struct Genre {
+    pub id: i32,
+    pub name: String,
 }
 
 impl Movie {
