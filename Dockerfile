@@ -12,7 +12,8 @@ RUN quasar build
 FROM rust:1.65.0-slim-bullseye as rust-builder
 WORKDIR /rust-app
 COPY . /rust-app  
-# ignore quasar-project
+# TODO ignore quasar-project
+ARG SQLX_OFFLINE=true
 RUN cargo build --release
 
 
@@ -23,6 +24,8 @@ COPY --from=frontend-builder /app/dist/spa /app/frontend/dist/spa
 COPY --from=rust-builder /rust-app/target/release/axum-quasar /app
 COPY --from=rust-builder /rust-app/migrations /app/migrations
 COPY --from=rust-builder /rust-app/dummy_data.json /app
+COPY --from=rust-builder /rust-app/sqlx-data.json /app
+COPY --from=rust-builder /rust-app/queries /app
 
 WORKDIR /app
 CMD ["./axum-quasar"]

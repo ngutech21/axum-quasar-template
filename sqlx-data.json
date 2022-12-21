@@ -1,0 +1,39 @@
+{
+  "db": "PostgreSQL",
+  "509e43d10e61a7f7f5eca6ddfd84906da02a9193eefc47a4d756432d98302046": {
+    "describe": {
+      "columns": [
+        {
+          "name": "movie_id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "movie_title",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "genre_id",
+          "ordinal": 2,
+          "type_info": "Int4"
+        },
+        {
+          "name": "genre_name",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "select m.id as movie_id, m.title as movie_title, \ng.id as genre_id, g.name as genre_name\nfrom movies m \nLEFT JOIN genres_to_movies piv on m.id = piv.movie_id \nLEFT JOIN genres g on g.id = piv.genre_id \norder by m.id\n"
+  }
+}
