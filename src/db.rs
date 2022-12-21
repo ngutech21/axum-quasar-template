@@ -40,15 +40,15 @@ pub trait DB {
 struct MovieWithGenresQuery {
     movie_id: i32,
     movie_title: String,
-    genre_id: i32,
-    genre_name: String,
+    genre_id: Option<i32>,
+    genre_name: Option<String>,
 }
 
 #[async_trait]
 impl DB for PostgresDB {
     async fn get_all_movies(&self) -> Result<Vec<Movie>, AxumQuasarError> {
         Ok(
-            sqlx::query_file_as!(MovieWithGenresQuery, "queries/get_all_movies.sql")
+            sqlx::query_file_as_unchecked!(MovieWithGenresQuery, "queries/get_all_movies.sql")
                 .fetch_all(&self.pool)
                 .await?
                 .into_iter()
@@ -58,10 +58,13 @@ impl DB for PostgresDB {
                         title: row.movie_title,
                         genres: HashSet::new(),
                     });
-                    movie.genres.insert(Genre {
-                        id: row.genre_id,
-                        name: row.genre_name,
-                    });
+
+                    if let (Some(genre_id), Some(genre_name)) = (row.genre_id, row.genre_name) {
+                        movie.genres.insert(Genre {
+                            id: genre_id,
+                            name: genre_name,
+                        });
+                    }
                     movies
                 })
                 .values()

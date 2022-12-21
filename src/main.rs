@@ -128,7 +128,11 @@ mod tests {
     #[tokio::test]
     #[ignore]
     async fn test_get_movies_from_db() -> anyhow::Result<()> {
-        let app = app(Box::new(PostgresDB::new().await.unwrap()));
+        tracing_subscriber::registry()
+            .with(tracing_subscriber::fmt::layer())
+            .init();
+
+        let app = app(Box::new(PostgresDB::new().await?));
         let response = app
             .oneshot(
                 Request::builder()
@@ -137,8 +141,13 @@ mod tests {
             )
             .await?;
 
-        assert_eq!(response.status(), StatusCode::OK);
+        let status = response.status();
         let body = hyper::body::to_bytes(response.into_body()).await?;
+        if status != StatusCode::OK {
+            dbg!(body.clone());
+        }
+
+        assert_eq!(status, StatusCode::OK);
         let result_data: Vec<Movie> = serde_json::from_slice(&body)?;
         dbg!(result_data);
         Ok(())

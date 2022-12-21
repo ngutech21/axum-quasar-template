@@ -32,14 +32,14 @@ impl Movie {
 
 #[derive(Error, Debug)]
 pub enum AxumQuasarError {
-    #[error("DBError: {0}")]
+    #[error(transparent)]
     DBError(#[from] sqlx::Error),
 }
 
 impl IntoResponse for AxumQuasarError {
     fn into_response(self) -> Response {
         let (status, error_message) = match self {
-            AxumQuasarError::DBError(_) => (StatusCode::INTERNAL_SERVER_ERROR, "DBError"),
+            AxumQuasarError::DBError(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()),
         };
 
         let body = Json(json!({
