@@ -20,6 +20,8 @@ type DBState = State<Arc<Box<dyn DB + Send + Sync>>>;
 async fn main() -> anyhow::Result<()> {
     let db = PostgresDB::new().await?;
     db.migrate().await;
+    let result = Movie::load_dummy_data();
+    db.import_movies(result).await?;
 
     tracing_subscriber::registry()
         .with(tracing_subscriber::fmt::layer())
@@ -124,6 +126,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore]
     async fn test_get_movies_from_db() -> anyhow::Result<()> {
         let app = app(Box::new(PostgresDB::new().await.unwrap()));
         let response = app
