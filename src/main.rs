@@ -67,7 +67,6 @@ async fn import_movies(State(db): DBState) -> Result<Html<&'static str>, AxumQua
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashSet;
 
     use super::*;
     use async_trait::async_trait;
@@ -83,8 +82,9 @@ mod tests {
         async fn get_all_movies(&self) -> Result<Vec<Movie>, AxumQuasarError> {
             Ok(vec![Movie {
                 id: 666,
+                release_year: 2021,
                 title: "foo".to_string(),
-                genres: HashSet::new(),
+                genres: Some(vec![]),
             }])
         }
 

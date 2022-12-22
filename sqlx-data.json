@@ -1,34 +1,39 @@
 {
   "db": "PostgreSQL",
-  "509e43d10e61a7f7f5eca6ddfd84906da02a9193eefc47a4d756432d98302046": {
+  "ed8c20c6ed9f9ef9551df6559b8d3455ccdfd5129d093c9e828f3dc540a4addc": {
     "describe": {
       "columns": [
         {
-          "name": "movie_id",
+          "name": "id",
           "ordinal": 0,
           "type_info": "Int4"
         },
         {
-          "name": "movie_title",
+          "name": "title",
           "ordinal": 1,
           "type_info": "Varchar"
         },
         {
-          "name": "genre_id",
+          "name": "genres",
           "ordinal": 2,
-          "type_info": "Int4"
+          "type_info": "VarcharArray"
         },
         {
-          "name": "genre_name",
+          "name": "release_year",
           "ordinal": 3,
-          "type_info": "Varchar"
+          "type_info": "Int2"
         }
       ],
-      "nullable": [false, false, true, true],
+      "nullable": [
+        false,
+        false,
+        true,
+        false
+      ],
       "parameters": {
         "Left": []
       }
     },
-    "query": "select m.id as movie_id, m.title as movie_title, \ng.id as genre_id, g.name as genre_name\nfrom movies m \nLEFT JOIN genres_to_movies piv on m.id = piv.movie_id \nLEFT JOIN genres g on g.id = piv.genre_id \norder by m.id\n"
+    "query": "select *\nfrom movies\norder by title;"
   }
 }

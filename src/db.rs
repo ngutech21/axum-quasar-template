@@ -1,6 +1,4 @@
-use std::collections::{HashMap, HashSet};
-
-use crate::model::{AxumQuasarError, Genre, Movie};
+use crate::model::{AxumQuasarError, Movie};
 use async_trait::async_trait;
 use sqlx::postgres::PgPoolOptions;
 
@@ -47,30 +45,10 @@ struct MovieWithGenresQuery {
 #[async_trait]
 impl DB for PostgresDB {
     async fn get_all_movies(&self) -> Result<Vec<Movie>, AxumQuasarError> {
-        Ok(
-            sqlx::query_file_as_unchecked!(MovieWithGenresQuery, "queries/get_all_movies.sql")
-                .fetch_all(&self.pool)
-                .await?
-                .into_iter()
-                .fold(HashMap::new(), |mut movies, row| {
-                    let movie = movies.entry(row.movie_id).or_insert(Movie {
-                        id: row.movie_id,
-                        title: row.movie_title,
-                        genres: HashSet::new(),
-                    });
-
-                    if let (Some(genre_id), Some(genre_name)) = (row.genre_id, row.genre_name) {
-                        movie.genres.insert(Genre {
-                            id: genre_id,
-                            name: genre_name,
-                        });
-                    }
-                    movies
-                })
-                .values()
-                .cloned()
-                .collect(),
-        )
+        let s: Vec<Movie> = sqlx::query_file_as!(Movie, "queries/get_all_movies.sql")
+            .fetch_all(&self.pool)
+            .await?;
+        Ok(s)
     }
 
     async fn insert_movie(&self, movie: Movie) -> Result<(), AxumQuasarError> {
@@ -88,11 +66,12 @@ impl DB for PostgresDB {
     async fn import_movies(&self, movies: Vec<Movie>) -> Result<(), AxumQuasarError> {
         for movie in movies {
             sqlx::query(
-                r#"INSERT INTO public.movies (id, title) VALUES ($1, $2);
+                r#"INSERT INTO public.movies (title, genres, release_year) VALUES ($1, $2, $3);
                 "#,
             )
-            .bind(movie.id)
             .bind(movie.title)
+            .bind(movie.genres)
+            .bind(movie.release_year)
             .execute(&self.pool)
             .await?;
         }

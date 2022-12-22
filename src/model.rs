@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use axum::{
     response::{IntoResponse, Response},
     Json,
@@ -11,21 +9,18 @@ use thiserror::Error;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Movie {
+    #[serde(skip)]
     pub id: i32,
+    #[serde(alias = "title")]
     pub title: String,
-    //pub year: i32,
-    pub genres: HashSet<Genre>,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, sqlx::FromRow, Hash)]
-pub struct Genre {
-    pub id: i32,
-    pub name: String,
+    #[serde(alias = "year")]
+    pub release_year: i16,
+    pub genres: Option<Vec<String>>,
 }
 
 impl Movie {
     pub fn load_dummy_data() -> Vec<Movie> {
-        serde_json::from_str::<Vec<Movie>>(include_str!("../dummy_data.json"))
+        serde_json::from_str::<Vec<Movie>>(include_str!("../tmp/wikipedia-movies.json"))
             .expect("Could not parse dummy data")
     }
 }
