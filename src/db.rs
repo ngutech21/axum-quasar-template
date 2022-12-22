@@ -25,6 +25,19 @@ impl PostgresDB {
             .await
             .expect("Could not run migrations");
     }
+
+    pub async fn start_transaction(
+        &self,
+    ) -> Result<sqlx::Transaction<'_, sqlx::Postgres>, sqlx::Error> {
+        self.pool.begin().await
+    }
+
+    pub async fn commit_transaction(
+        &self,
+        transaction: sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(), sqlx::Error> {
+        transaction.commit().await
+    }
 }
 
 #[async_trait]
@@ -74,6 +87,7 @@ impl DB for PostgresDB {
     }
 
     async fn import_movies(&self, movies: Vec<Movie>) -> Result<(), AxumQuasarError> {
+        let tx = self.start_transaction().await?;
         for movie in movies {
             sqlx::query(
                 r#"INSERT INTO public.movies (title, genres, release_year) VALUES ($1, $2, $3);
@@ -85,6 +99,7 @@ impl DB for PostgresDB {
             .execute(&self.pool)
             .await?;
         }
+        self.commit_transaction(tx).await?;
         Ok(())
     }
 }
