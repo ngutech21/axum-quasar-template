@@ -23,7 +23,6 @@ FROM debian:bullseye-slim
 COPY --from=frontend-builder /app/dist/spa /app/frontend/dist/spa
 COPY --from=rust-builder /rust-app/target/release/axum-quasar /app
 COPY --from=rust-builder /rust-app/migrations /app/migrations
-COPY --from=rust-builder /rust-app/dummy_data.json /app
 COPY --from=rust-builder /rust-app/sqlx-data.json /app
 COPY --from=rust-builder /rust-app/queries /app
 

@@ -20,7 +20,7 @@ pub struct Movie {
 
 impl Movie {
     pub fn load_dummy_data() -> Vec<Movie> {
-        serde_json::from_str::<Vec<Movie>>(include_str!("../tmp/wikipedia-movies.json"))
+        serde_json::from_str::<Vec<Movie>>(include_str!("../dummy_data.json"))
             .expect("Could not parse dummy data")
     }
 }
