@@ -9,7 +9,6 @@ use thiserror::Error;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Movie {
-    #[serde(skip)]
     pub id: i32,
     #[serde(alias = "title")]
     pub title: String,

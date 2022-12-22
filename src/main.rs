@@ -68,8 +68,6 @@ async fn get_movie(
         Some(movie) => Ok(Json(movie)),
         None => Err(AxumQuasarError::NotFound),
     }
-
-    //Ok(Json(result))
 }
 
 async fn import_movies(State(db): DBState) -> Result<Html<&'static str>, AxumQuasarError> {
@@ -97,7 +95,7 @@ mod tests {
                 id: 666,
                 release_year: 2021,
                 title: "foo".to_string(),
-                genres: Some(vec![]),
+                genres: Some(vec!["Drama".to_string()]),
             }])
         }
 
@@ -135,10 +133,10 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         let body = hyper::body::to_bytes(response.into_body()).await?;
         let result_data: Vec<Movie> = serde_json::from_slice(&body)?;
+        dbg!(&result_data);
         assert_eq!(result_data[0].id, 666);
         assert_eq!(result_data[0].title, "foo");
 
-        dbg!(result_data);
         Ok(())
     }
 
