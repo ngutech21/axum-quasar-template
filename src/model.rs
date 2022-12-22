@@ -29,12 +29,15 @@ impl Movie {
 pub enum AxumQuasarError {
     #[error(transparent)]
     DBError(#[from] sqlx::Error),
+    #[error("Not found")]
+    NotFound,
 }
 
 impl IntoResponse for AxumQuasarError {
     fn into_response(self) -> Response {
         let (status, error_message) = match self {
             AxumQuasarError::DBError(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()),
+            AxumQuasarError::NotFound => (StatusCode::OK, "not found".to_string()),
         };
 
         let body = Json(json!({

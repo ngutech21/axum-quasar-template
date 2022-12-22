@@ -30,6 +30,7 @@ impl PostgresDB {
 #[async_trait]
 pub trait DB {
     async fn get_all_movies(&self) -> Result<Vec<Movie>, AxumQuasarError>;
+    async fn get_movie(&self, id: i32) -> Result<Option<Movie>, AxumQuasarError>;
     async fn insert_movie(&self, movie: Movie) -> Result<(), AxumQuasarError>;
     async fn import_movies(&self, movies: Vec<Movie>) -> Result<(), AxumQuasarError>;
 }
@@ -44,6 +45,15 @@ struct MovieWithGenresQuery {
 
 #[async_trait]
 impl DB for PostgresDB {
+    async fn get_movie(&self, id: i32) -> Result<Option<Movie>, AxumQuasarError> {
+        //let rows = sqlx::query_file_as_unchecked!(Movie, "queries/get_movie.sql", id)
+        let rows = sqlx::query_as("SELECT * FROM movies where id = $1;")
+            .bind(id)
+            .fetch_optional(&self.pool)
+            .await?;
+        Ok(rows)
+    }
+
     async fn get_all_movies(&self) -> Result<Vec<Movie>, AxumQuasarError> {
         let s: Vec<Movie> = sqlx::query_file_as!(Movie, "queries/get_all_movies.sql")
             .fetch_all(&self.pool)

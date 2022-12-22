@@ -1,3 +1,4 @@
+use axum::extract::Path;
 use axum::{extract::State, response::Html, routing::get, Json, Router};
 use axum_extra::routing::SpaRouter;
 use db::PostgresDB;
@@ -20,8 +21,8 @@ type DBState = State<Arc<Box<dyn DB + Send + Sync>>>;
 async fn main() -> anyhow::Result<()> {
     let db = PostgresDB::new().await?;
     db.migrate().await;
-    let result = Movie::load_dummy_data();
-    db.import_movies(result).await?;
+    // let result = Movie::load_dummy_data();
+    // db.import_movies(result).await?;
 
     tracing_subscriber::registry()
         .with(tracing_subscriber::fmt::layer())
@@ -48,6 +49,7 @@ async fn main() -> anyhow::Result<()> {
 fn app(db: Box<dyn DB + Send + Sync>) -> Router {
     Router::new()
         .route("/api/v1/movies", get(get_movies))
+        .route("/api/v1/movie/:id", get(get_movie))
         .route("/api/v1/import_movies", get(import_movies))
         .merge(SpaRouter::new("/", "frontend/dist/spa").index_file("index.html"))
         .with_state(Arc::new(db))
@@ -57,6 +59,19 @@ fn app(db: Box<dyn DB + Send + Sync>) -> Router {
 async fn get_movies(State(db): DBState) -> Result<Json<Vec<Movie>>, AxumQuasarError> {
     let result = db.get_all_movies().await?;
     Ok(Json(result))
+}
+
+async fn get_movie(
+    Path(id): Path<i32>,
+    State(db): DBState,
+) -> Result<Json<Movie>, AxumQuasarError> {
+    let result = db.get_movie(id).await?;
+    match result {
+        Some(movie) => Ok(Json(movie)),
+        None => Err(AxumQuasarError::NotFound),
+    }
+
+    //Ok(Json(result))
 }
 
 async fn import_movies(State(db): DBState) -> Result<Html<&'static str>, AxumQuasarError> {
@@ -86,6 +101,10 @@ mod tests {
                 title: "foo".to_string(),
                 genres: Some(vec![]),
             }])
+        }
+
+        async fn get_movie(&self, _id: i32) -> Result<Option<Movie>, AxumQuasarError> {
+            unimplemented!()
         }
 
         #[allow(dead_code)]
