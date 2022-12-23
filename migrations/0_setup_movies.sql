@@ -3,6 +3,7 @@
 
 -- DROP TABLE IF EXISTS public.movies;
 
+DROP SEQUENCE IF EXISTS movies_id_seq;
 CREATE SEQUENCE movies_id_seq START 1;
 
 CREATE TABLE IF NOT EXISTS public.movies

@@ -14,3 +14,7 @@ args = ["--cwd", "quasar-project", "quasar", "build"]
 [tasks.build-docker]
 command = "docker"
 args = ["build", "-t", "registry.fly.io/axum-quasar:latest", "."]
+
+[tasks.start-proxy]
+command = "flyctl"
+args = ["proxy", "6542:5432", "-a axum-quasar-db"]

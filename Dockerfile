@@ -9,7 +9,7 @@ RUN quasar build
 
 
 # build backend
-FROM rust:1.65.0-slim-bullseye as rust-builder
+FROM rust:1.66.0-slim-bullseye as rust-builder
 WORKDIR /rust-app
 COPY . /rust-app  
 # TODO ignore quasar-project
