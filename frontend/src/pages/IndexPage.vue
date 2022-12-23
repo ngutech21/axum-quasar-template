@@ -20,19 +20,23 @@ import { QTableColumn } from 'quasar';
 import { useQuasar } from 'quasar';
 import { ref } from 'vue';
 
-const movies = ref([] as Movie[]);
-
 function import_movies(evt: Event) {
-  api.get('/import_movies').then((response) => {
-    alert('Movies imported');
-  });
+  if (evt) {
+    api.get('/import_movies').then((_) => {
+      alert('Movies imported');
+    });
+  }
 }
 
 function delete_movies(evt: Event) {
-  api.delete('/movies').then((_response) => {
-    alert('Movies deleted');
-  });
+  if (evt) {
+    api.delete('/movies').then((_response) => {
+      alert('Movies deleted');
+    });
+  }
 }
+
+const movies = ref([] as Movie[]);
 
 const columns = [
   { name: 'id', align: 'left', label: 'Id', field: 'id', sortable: true },
@@ -44,11 +48,13 @@ const columns = [
     sortable: true,
   },
   {
-    name: 'genre',
+    name: 'genres',
     align: 'left',
     label: 'Genres',
     field: 'genres',
     sortable: true,
+
+    format: (val, row) => val.join(', '),
   },
 ] as QTableColumn[];
 
