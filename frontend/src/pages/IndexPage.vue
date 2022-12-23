@@ -1,13 +1,18 @@
 <template>
   <q-page>
     <q-toolbar>
-      <q-toolbar-title>Movie Database</q-toolbar-title>
       <!-- add button thats calls a java script funtion-->
 
-      <q-btn flat label="Delete Movies" @click="delete_movies" />
-      <q-btn flat label="Import Movies" @click="import_movies" />
+      <q-btn
+        color="red"
+        class="q-mr-lg"
+        label="Delete Movies"
+        @click="delete_movies"
+      />
+
+      <q-btn label="Import Movies" @click="import_movies" />
     </q-toolbar>
-    <div class="q-pa-md">
+    <div>
       <q-table title="Movies" :rows="movies" :columns="columns" row-key="id" />
     </div>
   </q-page>
@@ -23,6 +28,7 @@ import { ref } from 'vue';
 function import_movies(evt: Event) {
   if (evt) {
     api.get('/import_movies').then((_) => {
+      load_movies();
       alert('Movies imported');
     });
   }
@@ -31,6 +37,7 @@ function import_movies(evt: Event) {
 function delete_movies(evt: Event) {
   if (evt) {
     api.delete('/movies').then((_response) => {
+      movies.value = [] as Movie[];
       alert('Movies deleted');
     });
   }
@@ -58,19 +65,23 @@ const columns = [
   },
 ] as QTableColumn[];
 
-const $q = useQuasar();
-api
-  .get('/movies')
-  .then((response) => {
-    movies.value = response.data;
-  })
-  .catch(() => {
-    $q.notify({
-      color: 'negative',
-      position: 'top',
-      message: 'Loading movies failed',
-      icon: 'report_problem',
+function load_movies() {
+  const $q = useQuasar();
+  api
+    .get('/movies')
+    .then((response) => {
+      movies.value = response.data;
+    })
+    .catch(() => {
+      $q.notify({
+        color: 'negative',
+        position: 'top',
+        message: 'Loading movies failed',
+        icon: 'report_problem',
+      });
+      console.log('Loading failed');
     });
-    console.log('Loading failed');
-  });
+}
+
+load_movies();
 </script>

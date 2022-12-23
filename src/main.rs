@@ -33,11 +33,12 @@ async fn main() -> anyhow::Result<()> {
     axum::Server::bind(&addr)
         .serve(
             app(Box::new(db))
-                .layer(
-                    CorsLayer::new()
-                        .allow_origin(Any)
-                        .allow_methods([Method::GET]),
-                )
+                .layer(CorsLayer::new().allow_origin(Any).allow_methods([
+                    Method::GET,
+                    Method::POST,
+                    Method::DELETE,
+                    Method::PUT,
+                ]))
                 .into_make_service(),
         )
         .await?;
