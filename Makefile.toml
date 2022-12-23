@@ -9,7 +9,12 @@ args = ["build", "--release"]
 
 [tasks.build-frontend]
 command = "yarn"
-args = ["--cwd", "quasar-project", "quasar", "build"]
+args = ["--cwd", "frontend", "quasar", "build"]
+
+[tasks.dev-server]
+command = "cargo"
+args = ["run"]
+dependencies = ["build-frontend"]
 
 [tasks.build-docker]
 command = "docker"

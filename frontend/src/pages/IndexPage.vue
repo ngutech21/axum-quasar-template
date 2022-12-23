@@ -1,5 +1,12 @@
 <template>
   <q-page>
+    <q-toolbar>
+      <q-toolbar-title>Movie Database</q-toolbar-title>
+      <!-- add button thats calls a java script funtion-->
+
+      <q-btn flat label="Delete Movies" @click="delete_movies" />
+      <q-btn flat label="Import Movies" @click="import_movies" />
+    </q-toolbar>
     <div class="q-pa-md">
       <q-table title="Movies" :rows="movies" :columns="columns" row-key="id" />
     </div>
@@ -15,6 +22,18 @@ import { ref } from 'vue';
 
 const movies = ref([] as Movie[]);
 
+function import_movies(evt: Event) {
+  api.get('/import_movies').then((response) => {
+    alert('Movies imported');
+  });
+}
+
+function delete_movies(evt: Event) {
+  api.delete('/movies').then((_response) => {
+    alert('Movies deleted');
+  });
+}
+
 const columns = [
   { name: 'id', align: 'left', label: 'Id', field: 'id', sortable: true },
   {
@@ -22,6 +41,13 @@ const columns = [
     align: 'left',
     label: 'Title',
     field: 'title',
+    sortable: true,
+  },
+  {
+    name: 'genre',
+    align: 'left',
+    label: 'Genres',
+    field: 'genres',
     sortable: true,
   },
 ] as QTableColumn[];

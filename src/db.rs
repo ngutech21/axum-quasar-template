@@ -42,6 +42,7 @@ impl PostgresDB {
 
 #[async_trait]
 pub trait DB {
+    async fn delete_movies(&self) -> Result<(), AxumQuasarError>;
     async fn get_all_movies(&self) -> Result<Vec<Movie>, AxumQuasarError>;
     async fn get_movie(&self, id: i32) -> Result<Option<Movie>, AxumQuasarError>;
     async fn insert_movie(&self, movie: Movie) -> Result<(), AxumQuasarError>;
@@ -67,6 +68,13 @@ impl DB for PostgresDB {
         Ok(rows)
     }
 
+    async fn delete_movies(&self) -> Result<(), AxumQuasarError> {
+        sqlx::query("DELETE FROM movies;")
+            .execute(&self.pool)
+            .await?;
+        Ok(())
+    }
+
     async fn get_all_movies(&self) -> Result<Vec<Movie>, AxumQuasarError> {
         let s: Vec<Movie> = sqlx::query_file_as_unchecked!(Movie, "queries/get_all_movies.sql")
             .fetch_all(&self.pool)
@@ -76,11 +84,13 @@ impl DB for PostgresDB {
 
     async fn insert_movie(&self, movie: Movie) -> Result<(), AxumQuasarError> {
         sqlx::query(
-            r#"INSERT INTO public.movies (id, title) VALUES ($1, $2);
+            r#"INSERT INTO public.movies (id, title, release_year, genres) VALUES ($1, $2, $3, $4);
             "#,
         )
         .bind(movie.id)
         .bind(movie.title)
+        .bind(movie.release_year)
+        .bind(movie.genres)
         .execute(&self.pool)
         .await?;
         Ok(())

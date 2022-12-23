@@ -46,7 +46,7 @@ async fn main() -> anyhow::Result<()> {
 
 fn app(db: Box<dyn DB + Send + Sync>) -> Router {
     Router::new()
-        .route("/api/v1/movies", get(get_movies))
+        .route("/api/v1/movies", get(get_movies).delete(delete_movies))
         .route("/api/v1/movie/:id", get(get_movie))
         .route("/api/v1/import_movies", get(import_movies))
         .merge(SpaRouter::new("/", "frontend/dist/spa").index_file("index.html"))
@@ -57,6 +57,11 @@ fn app(db: Box<dyn DB + Send + Sync>) -> Router {
 async fn get_movies(State(db): DBState) -> Result<Json<Vec<Movie>>, AxumQuasarError> {
     let result = db.get_all_movies().await?;
     Ok(Json(result))
+}
+
+async fn delete_movies(State(db): DBState) -> Result<(), AxumQuasarError> {
+    db.delete_movies().await?;
+    Ok(())
 }
 
 async fn get_movie(
@@ -97,6 +102,10 @@ mod tests {
                 title: "foo".to_string(),
                 genres: Some(vec!["Drama".to_string()]),
             }])
+        }
+
+        async fn delete_movies(&self) -> Result<(), AxumQuasarError> {
+            unimplemented!()
         }
 
         async fn get_movie(&self, _id: i32) -> Result<Option<Movie>, AxumQuasarError> {
