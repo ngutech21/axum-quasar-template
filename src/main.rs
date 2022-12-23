@@ -92,7 +92,7 @@ mod tests {
     impl DB for MockDB {
         async fn get_all_movies(&self) -> Result<Vec<Movie>, AxumQuasarError> {
             Ok(vec![Movie {
-                id: 666,
+                id: Some(666),
                 release_year: 2021,
                 title: "foo".to_string(),
                 genres: Some(vec!["Drama".to_string()]),
@@ -134,7 +134,7 @@ mod tests {
         let body = hyper::body::to_bytes(response.into_body()).await?;
         let result_data: Vec<Movie> = serde_json::from_slice(&body)?;
         dbg!(&result_data);
-        assert_eq!(result_data[0].id, 666);
+        assert_eq!(result_data[0].id.unwrap(), 666);
         assert_eq!(result_data[0].title, "foo");
 
         Ok(())

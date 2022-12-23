@@ -68,7 +68,7 @@ impl DB for PostgresDB {
     }
 
     async fn get_all_movies(&self) -> Result<Vec<Movie>, AxumQuasarError> {
-        let s: Vec<Movie> = sqlx::query_file_as!(Movie, "queries/get_all_movies.sql")
+        let s: Vec<Movie> = sqlx::query_file_as_unchecked!(Movie, "queries/get_all_movies.sql")
             .fetch_all(&self.pool)
             .await?;
         Ok(s)
