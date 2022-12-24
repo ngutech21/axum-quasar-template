@@ -46,6 +46,7 @@ pub trait DB {
     async fn get_all_movies(&self) -> Result<Vec<Movie>, AxumQuasarError>;
     async fn get_movie(&self, id: i32) -> Result<Option<Movie>, AxumQuasarError>;
     async fn insert_movie(&self, movie: Movie) -> Result<(), AxumQuasarError>;
+    async fn update_movie(&self, movie: Movie) -> Result<(), AxumQuasarError>;
     async fn import_movies(&self, movies: Vec<Movie>) -> Result<(), AxumQuasarError>;
 }
 
@@ -82,17 +83,31 @@ impl DB for PostgresDB {
         Ok(s)
     }
 
-    async fn insert_movie(&self, movie: Movie) -> Result<(), AxumQuasarError> {
+    async fn update_movie(&self, movie: Movie) -> Result<(), AxumQuasarError> {
         sqlx::query(
-            r#"INSERT INTO public.movies (id, title, release_year, genres) VALUES ($1, $2, $3, $4);
+            r#"UPDATE public.movies SET (title, release_year, genres) VALUES ($1, $2, $3) WHERE id=$4;
             "#,
         )
+        .bind(movie.title)
+        .bind(movie.release_year)
+        .bind(movie.genres)
         .bind(movie.id)
+        .execute(&self.pool)
+        .await?;
+        Ok(())
+    }
+
+    async fn insert_movie(&self, movie: Movie) -> Result<(), AxumQuasarError> {
+        sqlx::query(
+            r#"INSERT INTO public.movies (title, release_year, genres) VALUES ($1, $2, $3);
+            "#,
+        )
         .bind(movie.title)
         .bind(movie.release_year)
         .bind(movie.genres)
         .execute(&self.pool)
         .await?;
+        // FIXME return ID of new created movie
         Ok(())
     }
 
