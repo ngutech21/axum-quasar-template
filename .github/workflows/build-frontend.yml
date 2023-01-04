@@ -1,0 +1,39 @@
+name: Build frontend
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SQLX_OFFLINE: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: yarn add quasar-cli
+        uses: Borales/actions-yarn@v4.2.0
+        with:
+          cmd: global add @quasar/cli
+          dir: "frontend"
+
+      - name: yarn install
+        uses: Borales/actions-yarn@v4.2.0
+        with:
+          cmd: install
+          dir: "frontend"
+
+      - name: yarn build
+        uses: Borales/actions-yarn@v4.2.0
+        with:
+          cmd: quasar build
+          dir: "frontend"
