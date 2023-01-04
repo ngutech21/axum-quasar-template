@@ -36,7 +36,7 @@ jobs:
       - name: yarn install
         uses: Borales/actions-yarn@v4.2.0
         with:
-          cmd: yarn install
+          cmd: install
           dir: "frontend"
 
       - name: yarn build
