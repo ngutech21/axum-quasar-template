@@ -1,5 +1,5 @@
 # build frontend
-FROM node:18-bullseye-slim as frontend-builder
+FROM node:16-bullseye-slim as frontend-builder
 WORKDIR /app
 COPY frontend ./
 RUN yarn global add @quasar/cli
