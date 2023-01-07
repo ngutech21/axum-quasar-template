@@ -68,9 +68,12 @@ async fn delete_movies(State(db): DBState) -> Result<(), AxumQuasarError> {
     Ok(())
 }
 
-async fn create_movie(State(db): DBState, Json(movie): Json<Movie>) -> Result<(), AxumQuasarError> {
-    db.insert_movie(movie).await?;
-    Ok(())
+async fn create_movie(
+    State(db): DBState,
+    Json(movie): Json<Movie>,
+) -> Result<Json<Movie>, AxumQuasarError> {
+    let result = db.insert_movie(movie).await?;
+    Ok(Json(result))
 }
 
 async fn update_movie(
@@ -142,7 +145,7 @@ mod tests {
         }
 
         #[allow(dead_code)]
-        async fn insert_movie(&self, _movie: Movie) -> Result<(), AxumQuasarError> {
+        async fn insert_movie(&self, _movie: Movie) -> Result<Movie, AxumQuasarError> {
             unimplemented!()
         }
     }
@@ -198,6 +201,48 @@ mod tests {
         assert_eq!(status, StatusCode::OK);
         let result_data: Vec<Movie> = serde_json::from_slice(&body)?;
         dbg!(result_data);
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_insert_movie() -> anyhow::Result<()> {
+        tracing_subscriber::registry()
+            .with(tracing_subscriber::fmt::layer())
+            .init();
+
+        let movie = Movie {
+            id: None,
+            release_year: 1966,
+            title: "foo bar baz".to_string(),
+            genres: Some(vec!["Drama".to_string()]),
+        };
+
+        let body = Body::from(serde_json::to_string(&movie)?);
+
+        let app = app(Box::new(PostgresDB::new().await?));
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .header("Content-type", "application/json")
+                    .uri("/api/v1/movies")
+                    .body(body)?,
+            )
+            .await?;
+
+        let status = response.status();
+        dbg!(status);
+        let body = hyper::body::to_bytes(response.into_body()).await?;
+
+        if status != StatusCode::OK {
+            dbg!(&body);
+        }
+
+        assert_eq!(status, StatusCode::OK);
+        let result_data: Movie = serde_json::from_slice(&body)?;
+        dbg!(&result_data);
+        assert!(result_data.id.is_some());
         Ok(())
     }
 }

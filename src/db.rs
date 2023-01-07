@@ -1,6 +1,6 @@
 use crate::model::{AxumQuasarError, Movie};
 use async_trait::async_trait;
-use sqlx::postgres::PgPoolOptions;
+use sqlx::{postgres::PgPoolOptions, Row};
 
 pub struct PostgresDB {
     pool: sqlx::Pool<sqlx::Postgres>,
@@ -45,7 +45,7 @@ pub trait DB {
     async fn delete_movies(&self) -> Result<(), AxumQuasarError>;
     async fn get_all_movies(&self) -> Result<Vec<Movie>, AxumQuasarError>;
     async fn get_movie(&self, id: i32) -> Result<Option<Movie>, AxumQuasarError>;
-    async fn insert_movie(&self, movie: Movie) -> Result<(), AxumQuasarError>;
+    async fn insert_movie(&self, movie: Movie) -> Result<Movie, AxumQuasarError>;
     async fn update_movie(&self, movie: Movie) -> Result<(), AxumQuasarError>;
     async fn import_movies(&self, movies: Vec<Movie>) -> Result<(), AxumQuasarError>;
 }
@@ -97,18 +97,22 @@ impl DB for PostgresDB {
         Ok(())
     }
 
-    async fn insert_movie(&self, movie: Movie) -> Result<(), AxumQuasarError> {
-        sqlx::query(
-            r#"INSERT INTO public.movies (title, release_year, genres) VALUES ($1, $2, $3);
+    async fn insert_movie(&self, movie: Movie) -> Result<Movie, AxumQuasarError> {
+        let res = sqlx::query(
+            r#"INSERT INTO public.movies (title, release_year, genres) VALUES ($1, $2, $3) RETURNING id;
             "#,
         )
-        .bind(movie.title)
+        .bind(&movie.title)
         .bind(movie.release_year)
-        .bind(movie.genres)
-        .execute(&self.pool)
+        .bind(&movie.genres)
+        .fetch_one(&self.pool)
         .await?;
-        // FIXME return ID of new created movie
-        Ok(())
+        let new_id = res.try_get::<i32, _>(0)?;
+
+        Ok(Movie {
+            id: Some(new_id),
+            ..movie
+        })
     }
 
     async fn import_movies(&self, movies: Vec<Movie>) -> Result<(), AxumQuasarError> {
