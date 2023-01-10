@@ -22,7 +22,7 @@
     "@typescript-eslint/parser": "^5.47.1",
     "eslint": "^8.30.0",
     "eslint-plugin-vue": "^9.0.0",
-    "eslint-config-prettier": "^8.1.0",
+    "eslint-config-prettier": "^8.6.0",
     "prettier": "^2.5.1",
     "@types/node": "^18.11.18",
     "@quasar/app-vite": "^1.0.0",
