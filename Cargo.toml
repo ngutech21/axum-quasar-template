@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.68"
-async-trait = "0.1.60"
+async-trait = "0.1.61"
 axum = "0.6.1"
 axum-extra = { version = "0.4.2", features = ["spa"] }
 dotenvy = "0.15.6"
