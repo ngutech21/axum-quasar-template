@@ -23,7 +23,7 @@
     "eslint": "^8.33.0",
     "eslint-plugin-vue": "^9.9.0",
     "eslint-config-prettier": "^8.6.0",
-    "prettier": "^2.8.3",
+    "prettier": "^2.8.4",
     "@types/node": "^18.11.19",
     "@quasar/app-vite": "^1.2.0",
     "autoprefixer": "^10.4.2",
