@@ -9,7 +9,7 @@ edition = "2021"
 anyhow = "1.0.69"
 async-trait = "0.1.64"
 axum = "0.6.4"
-axum-extra = { version = "0.4.2", features = ["spa"] }
+axum-extra = { version = "0.5.0", features = ["spa"] }
 dotenvy = "0.15.6"
 hyper = "0.14.24"
 serde = { version = "1.0.152", features = ["derive"] }
